@@ -13,6 +13,7 @@ export default function App() {
       <CounterInSingleBlock />
       {/* same functionality as Counter in Single block but by passing props between nested components and useState */}
       <StepCounter />
+      <SliderCounter />
     </div>
   );
 }
@@ -175,6 +176,66 @@ function Steps() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SliderCounter() {
+  const [count, setCount] = useState(0);
+  const [step, setStep] = useState(0);
+  const date = new Date();
+  date.setDate(date.getDate() + count);
+  return (
+    <div>
+      <div>
+        <div>
+          <input
+            type="range"
+            min={0}
+            max={10}
+            value={step}
+            onChange={(e) => setStep(Number(e.target.value))}
+          />
+          {step}
+        </div>
+        <button className="btn" onClick={() => setCount((c) => c - step)}>
+          -
+        </button>
+        <input
+          type="text"
+          value={count}
+          onChange={(e) => setCount(Number(e.target.value))}
+        />
+        <button className="btn" onClick={() => setCount((c) => c + step)}>
+          +
+        </button>
+      </div>
+      <div>
+        <p>
+          <span>
+            {count === 0
+              ? "Today is "
+              : count > 0
+              ? `${count} days from today is `
+              : `${Math.abs(count)} days ago was`}
+          </span>
+          <span></span>
+          {date.toDateString()}
+        </p>
+      </div>
+      {count !== 0 || step !== 0 ? (
+        <div>
+          <button
+            className="btn"
+            onClick={() => {
+              setCount(0);
+              setStep(0);
+            }}
+          >
+            Reset
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
