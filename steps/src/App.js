@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Accordion from "./accordian";
+import TipCalculator from "./TipCalculator";
 
 const messages = [
   "Learn React ⚛️",
@@ -10,14 +11,15 @@ const messages = [
 export default function App() {
   return (
     <div>
-      <Steps />
+      {/*<Steps />
       <StepsWithChildrenProps />
       <CounterInSingleBlock />
-      {/* same functionality as Counter in Single block but by passing props between nested components and useState */}
+       same functionality as Counter in Single block but by passing props between nested components and useState 
       <StepCounter />
-      <SliderCounter />
+      <SliderCounter />*/}
       <div style={{ backgroundColor: "#d0e5e7" }}>
         <Accordion />
+        <TipCalculator />
       </div>
     </div>
   );
