@@ -11,6 +11,7 @@ export default function App() {
   return (
     <div>
       <Steps />
+      <StepsWithChildrenProps />
       <CounterInSingleBlock />
       {/* same functionality as Counter in Single block but by passing props between nested components and useState */}
       <StepCounter />
@@ -181,6 +182,71 @@ function Steps() {
         </div>
       )}
     </div>
+  );
+}
+
+function StepsWithChildrenProps() {
+  //let step = 1;
+
+  // creating a state and destructuring the object int state variable and the function to set the variable
+
+  const [step, setStep] = useState(1);
+  const [isOpen, setisOpen] = useState(true);
+  //const [ishide, setishide] = useState(true);
+
+  function handlePrevious() {
+    if (step > 1) setStep((curStep) => curStep - 1);
+  }
+  function handleNext() {
+    if (step < 3) setStep((curStep) => curStep + 1);
+  }
+
+  return (
+    <div style={{ backgroundColor: "#99de9c" }}>
+      <button
+        className="close"
+        onClick={() => setisOpen((isOpenParam) => !isOpenParam)}
+      >
+        {isOpen ? "hide" : "show"}
+      </button>
+      {isOpen && (
+        <div className="steps">
+          <div className="numbers">
+            <div className={`${step >= 1 ? "active" : ""}`}>1</div>
+            <div className={`${step >= 2 ? "active" : ""}`}>2</div>
+            <div className={`${step >= 3 ? "active" : ""}`}>3</div>
+          </div>
+
+          <p className="message">
+            Step {step}: {messages[step - 1]}
+          </p>
+
+          <div className="buttons">
+            <Button
+              bgColor={"#7950f2"}
+              textColor={"#fff"}
+              onClick={handlePrevious}
+            >
+              <span>👈</span>Previous
+            </Button>
+            <Button bgColor={"#7950f2"} textColor={"#fff"} onClick={handleNext}>
+              Next <span>👉</span>
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Button({ children, textColor, bgColor, onClick }) {
+  return (
+    <button
+      style={{ backgroundColor: bgColor, color: textColor }}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 }
 
