@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Accordion from "./accordian";
 
 const messages = [
   "Learn React ⚛️",
@@ -14,6 +15,9 @@ export default function App() {
       {/* same functionality as Counter in Single block but by passing props between nested components and useState */}
       <StepCounter />
       <SliderCounter />
+      <div style={{ backgroundColor: "#d0e5e7" }}>
+        <Accordion />
+      </div>
     </div>
   );
 }
@@ -24,7 +28,7 @@ function CounterInSingleBlock() {
   const date = new Date();
   date.setDate(date.getDate() + count);
   return (
-    <div>
+    <div style={{ backgroundColor: "lightgreen" }}>
       <div>
         <div>
           <button className="btn" onClick={() => setStep((c) => c - 1)}>
@@ -70,7 +74,7 @@ function StepCounter() {
     setstepCnt((st) => (st > 0 ? st - 1 : 0));
   }
   return (
-    <div className="container">
+    <div className="container" style={{ backgroundColor: "lightblue" }}>
       <button className="btn" onClick={decrementStepCnt}>
         -
       </button>
@@ -141,7 +145,7 @@ function Steps() {
   }
 
   return (
-    <div>
+    <div style={{ backgroundColor: "#89de9c" }}>
       <button
         className="close"
         onClick={() => setisOpen((isOpenParam) => !isOpenParam)}
@@ -186,7 +190,7 @@ function SliderCounter() {
   const date = new Date();
   date.setDate(date.getDate() + count);
   return (
-    <div>
+    <div style={{ backgroundColor: "#52a9ad" }}>
       <div>
         <div>
           <input
