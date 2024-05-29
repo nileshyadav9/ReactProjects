@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const initialFriends = [
   {
     id: 118836,
@@ -20,21 +22,31 @@ const initialFriends = [
 ];
 
 export default function App() {
+  const [friends, setFriends] = useState([...initialFriends]);
+  const [showAddFriend, setShowAddFreiend] = useState(false);
+  function handleShowAddFriend() {
+    setShowAddFreiend((show) => !show);
+  }
+
+  function handleAddFriend(friend) {
+    setFriends((friends) => [...friends, friend]);
+  }
+
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsList />
-        <FormAddFriend />
-        <Button>Add Friend</Button>
+        <FriendsList friends={friends} />
+        {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
+        <Button handleClick={handleShowAddFriend}>
+          {showAddFriend ? "Close" : "Add Friend"}
+        </Button>
       </div>
       <FormSplitBill />
     </div>
   );
 }
 
-function FriendsList() {
-  const friends = initialFriends;
-
+function FriendsList({ friends }) {
   return (
     <ul>
       {friends.map((friend) => (
@@ -66,22 +78,54 @@ function Friend({ friend }) {
   );
 }
 
-function FormAddFriend() {
+function FormAddFriend({ onAddFriend }) {
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("https://i.pravatar.cc/48");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!name || !image) return;
+    const id = crypto.randomUUID();
+    const newFriend = {
+      name,
+      image: `${image}?=${id}`,
+      balance: 0,
+      id: crypto.randomUUID(), // create a random number
+    };
+    onAddFriend(newFriend);
+    setName("");
+    setImage("https://i.pravatar.cc/48");
+  }
+
   return (
-    <form className="form-add-friend">
+    <form className="form-add-friend" onSubmit={handleSubmit}>
       <label>🧑‍🤝‍🧑Friend Name</label>
-      <input type="text" />
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
 
       <label>📸ImageURL</label>
-      <input type="text" />
+      <input
+        type="text"
+        value={image}
+        onChange={(e) => setImage(e.target.value)}
+      />
 
       <Button>Add</Button>
     </form>
   );
 }
 
-function Button({ children }) {
-  return <button className="button"> {children}</button>;
+function Button({ children, handleClick }) {
+  return (
+    <button className="button" onClick={handleClick}>
+      {" "}
+      {children}
+    </button>
+  );
 }
 function FormSplitBill() {
   return (
