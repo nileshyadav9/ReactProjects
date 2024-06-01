@@ -68,7 +68,11 @@ export default function App() {
         </Button>
       </div>
       {selectedFriend && (
-        <FormSplitBill frnd={selectedFriend} onSplitBill={handleBillSplit} />
+        <FormSplitBill
+          frnd={selectedFriend}
+          onSplitBill={handleBillSplit}
+          key={selectedFriend.id}
+        />
       )}
     </div>
   );
