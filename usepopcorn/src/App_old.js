@@ -49,72 +49,34 @@ const tempWatchedData = [
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
+
 const KEY = "f84fc31d";
-//const searchMovieName = "interstellar";
 
 export default function App() {
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [fetchError, setFetchError] = useState("");
-  const [query, setQuery] = useState("");
 
-  useEffect(
-    function () {
-      async function getMovies() {
-        try {
-          setIsLoading(true);
-          setFetchError("");
-          const result = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-          );
+  useEffect(function () {
+    async function getMovies() {
+      const result = await fetch(
+        `http://www.omdbapi.com/apikey=${KEY}&s=interstellar`
+      );
+      const searchedMovieList = await result.json();
+      setMovies(searchedMovieList.Search);
+    }
+    getMovies();
+  }, []);
 
-          if (!result.ok)
-            throw new Error(
-              "Something Happened, please refresh page and try again!"
-            );
-          const searchedMovieList = await result.json();
-          if (searchedMovieList.Response !== "False")
-            setMovies(searchedMovieList.Search);
-          else {
-            throw new Error(searchedMovieList.Error);
-          }
-        } catch (error) {
-          console.log(error);
-          setFetchError(error.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      if (query.length < 3) {
-        setMovies([]);
-        setFetchError(
-          "Please type at least 3 characters to start movie search!"
-        );
-        console.log("cald2");
-      } else {
-        getMovies();
-      }
-    },
-    [query]
-  );
   return (
     <>
       <NavBar>
-        <Search query={query} setQuery={setQuery} />
+        <Search />
         <Results movies={movies} />
       </NavBar>
 
       <Main>
         <Box>
-          {isLoading && (
-            <PreResultScreen className="loader">Loading.</PreResultScreen>
-          )}
-          {!isLoading && !fetchError}
-          {fetchError && (
-            <PreResultScreen className="error">🤦‍♂️ {fetchError}</PreResultScreen>
-          )}
-          {!isLoading && !fetchError && <MovieList movies={movies} />}
+          <MovieList movies={movies} />
         </Box>
         <Box>
           <Summary watched={watched} />
@@ -123,10 +85,6 @@ export default function App() {
       </Main>
     </>
   );
-}
-
-function PreResultScreen({ children, className }) {
-  return <p className={className}>{children}</p>;
 }
 
 function Results({ movies }) {
@@ -144,7 +102,8 @@ function Logo() {
     </div>
   );
 }
-function Search({ query, setQuery }) {
+function Search() {
+  const [query, setQuery] = useState("");
   return (
     <input
       className="search"
