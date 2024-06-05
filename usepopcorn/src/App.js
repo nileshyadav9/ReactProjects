@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import StarRating from "./StarRating";
 
-const tempMovieData = [
+/* const tempMovieData = [
   {
     imdbID: "tt1375666",
     Title: "Inception",
@@ -22,7 +23,7 @@ const tempMovieData = [
     Poster:
       "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
   },
-];
+]; */
 
 const tempWatchedData = [
   {
@@ -58,13 +59,17 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState("");
   const [query, setQuery] = useState("");
-  const [selectedMovieId, setSelectedMovieId] = useState("tt1375666");
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
 
   function handleSelectedMovie(id) {
     setSelectedMovieId((sid) => (sid === id ? null : id));
   }
   function handleClearSelection() {
     setSelectedMovieId(null);
+  }
+
+  function handleAddWathced(watchedMovie) {
+    setWatched((watched) => [...watched, watchedMovie]);
   }
 
   useEffect(
@@ -131,6 +136,7 @@ export default function App() {
             <SelectedMovie
               selectedMovieId={selectedMovieId}
               onClearSelection={handleClearSelection}
+              onAddWatched={handleAddWathced}
             />
           ) : (
             <>
@@ -211,7 +217,11 @@ function Movie({ movie, onSelectedMovie }) {
   );
 }
 
-function SelectedMovie({ selectedMovieId, onClearSelection }) {
+function SelectedMovie({
+  selectedMovieId,
+  onClearSelection,
+  handleAddWathced,
+}) {
   const [movie, setMovie] = useState({});
   const {
     Title: title,
@@ -225,21 +235,39 @@ function SelectedMovie({ selectedMovieId, onClearSelection }) {
     Genre: genre,
     imdbRating,
   } = movie;
-  useEffect(function () {
-    async function getMovieDetails() {
-      const result = await fetch(
-        `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedMovieId}`
-      );
 
-      if (!result.ok)
-        throw new Error(
-          "Something Happened, please refresh page and try again!"
+  function handleAdd() {
+    const watchedMovie = {
+      imdbID: selectedMovieId,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: Number(runtime.split(" ").at(0)),
+    };
+    handleAddWathced(watchedMovie);
+  }
+
+  useEffect(
+    function () {
+      async function getMovieDetails() {
+        const result = await fetch(
+          `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedMovieId}`
         );
-      const movieDetails = await result.json();
-      setMovie(movieDetails);
-    }
-    getMovieDetails();
-  }, []);
+
+        console.log(result);
+        if (!result.ok)
+          throw new Error(
+            "Something Happened, please refresh page and try again!"
+          );
+        const movieDetails = await result.json();
+        setMovie(movieDetails);
+      }
+      //alert(selectedMovieId);
+      getMovieDetails();
+    },
+    [selectedMovieId]
+  );
 
   return (
     <div className="details">
@@ -254,11 +282,15 @@ function SelectedMovie({ selectedMovieId, onClearSelection }) {
             {released} &bull; {runtime}
           </p>
           <p>{genre}</p>
-          <p>{imdbRating}</p>
+          <p>⭐ {imdbRating} IMDb rating</p>
         </div>
       </header>
 
       <section>
+        <div className="rating">
+          <StarRating size={20} maxRating={10} />
+        </div>
+        <button onClick={handleAdd}>Add to Watched List</button>
         <p>
           <em>{plot}</em>
         </p>
@@ -322,8 +354,8 @@ function WatchedList({ watched }) {
 function WatchedMovie({ movie }) {
   return (
     <li>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.poster} alt={`${movie.title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
@@ -342,7 +374,7 @@ function WatchedMovie({ movie }) {
   );
 }
 
-function WatchedBox({ children }) {
+/* function WatchedBox({ children }) {
   /* 
 
   return (
@@ -355,8 +387,8 @@ function WatchedBox({ children }) {
       </button>
       {isOpen2 && children}
     </div>
-  ); */
-}
+  ); 
+} */
 
 function Main({ children }) {
   return <main className="main">{children}</main>;
