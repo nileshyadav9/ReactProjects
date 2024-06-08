@@ -55,7 +55,11 @@ const KEY = "f84fc31d";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  //const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(function () {
+    const localData = localStorage.getItem("watchedMovies");
+    return JSON.parse(localData);
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState("");
   const [query, setQuery] = useState("");
@@ -77,6 +81,13 @@ export default function App() {
       watched.filter((movie) => movie.imdbID !== movieId)
     );
   }
+
+  useEffect(
+    function () {
+      localStorage.setItem("watchedMovies", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   useEffect(
     function () {
