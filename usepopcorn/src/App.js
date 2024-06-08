@@ -80,12 +80,14 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
       async function getMovies() {
         try {
           setIsLoading(true);
           setFetchError("");
           const result = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
 
           if (!result.ok)
@@ -93,26 +95,33 @@ export default function App() {
               "Something Happened, please refresh page and try again!"
             );
           const searchedMovieList = await result.json();
-          if (searchedMovieList.Response !== "False")
+          if (searchedMovieList.Response !== "False") {
             setMovies(searchedMovieList.Search);
-          else {
+            setFetchError("");
+          } else {
             throw new Error(searchedMovieList.Error);
           }
         } catch (error) {
-          console.log(error);
-          setFetchError(error.message);
+          if (error.name !== "AbortError") setFetchError(error.message);
         } finally {
           setIsLoading(false);
         }
       }
       if (query.length < 3) {
         setMovies([]);
+
         setFetchError(
           "Please type at least 3 characters to start movie search!"
         );
         //console.log("cald2");
       } else {
+        handleClearSelection();
         getMovies();
+
+        //cleanup function
+        return function () {
+          controller.abort();
+        };
       }
     },
     [query]
@@ -267,9 +276,28 @@ function SelectedMovie({
 
   useEffect(
     function () {
+      function eventListnerCallback(e) {
+        if (e.code === "Escape") {
+          onClearSelection();
+        }
+      }
+
+      document.addEventListener("keydown", eventListnerCallback);
+
+      //cleanup function
+      return function () {
+        document.removeEventListener("keydown", eventListnerCallback);
+      };
+    },
+    [onClearSelection]
+  );
+
+  useEffect(
+    function () {
       if (!title) return;
       document.title = `Movie | ${title}`;
 
+      //cleanup function
       return function () {
         document.title = "MovieLibrary";
       };
