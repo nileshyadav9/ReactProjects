@@ -18,11 +18,22 @@
     </div>
   );
 } */
-import DateCounter from "./DateCounter";
+//import DateCounter from "./DateCounter";
+import Header from "./Header";
+import Main from "./Main";
+import { useEffect } from "react";
 export default function App() {
+  useEffect(function () {
+    fetch("http://localhost:9000/questions")
+      .then((res) => res.json)
+      .then((data) => console.log(data))
+      .catch((err) => console.error(err));
+  }, []);
   return (
     <div>
-      <DateCounter />
+      {/* <DateCounter /> */}
+      <Header />
+      <Main />
     </div>
   );
 }
