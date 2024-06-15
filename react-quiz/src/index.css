@@ -6,6 +6,7 @@
 
   --color-theme: #1098ad;
   --color-accent: #ffa94d;
+  --color-wronganswer: #e05858;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Codystar&display=swap");
@@ -133,7 +134,7 @@ progress {
 }
 
 .btn-option:not([disabled]):hover {
-  transform: translateX(1.2rem);
+  transform: translateX(1.5rem);
 }
 
 .btn[disabled]:hover {
@@ -162,13 +163,18 @@ progress {
   color: var(--color-light);
 }
 .btn-option.wrong {
-  background-color: var(--color-accent);
-  border: 2px solid var(--color-accent);
-  color: var(--color-darkest);
+  /* background-color: var(--color-accent); */
+  /* border: 2px solid var(--color-accent);
+  color: var(--color-darkest); */
 }
 
 .answer {
-  transform: translateX(2rem);
+  transform: translateX(2.1rem);
+}
+.answer.wrong {
+  background-color: var(--color-wronganswer);
+  border: 2px solid var(--color-darkest);
+  color: var(--color-light);
 }
 
 .result {
