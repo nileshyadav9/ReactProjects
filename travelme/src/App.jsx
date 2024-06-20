@@ -1,6 +1,6 @@
 //204 => esLint config
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Homepage from "./pages/Homepage";
 import Product from "./pages/product";
@@ -52,10 +52,7 @@ function App() {
             element={<CountryList cities={cities} isLoading={isLoading} />}
           />
           <Route path="form" element={<Form />} />
-          <Route
-            index
-            element={<CityList cities={cities} isLoading={isLoading} />}
-          />
+          <Route index element={<Navigate replace to="cities" />} />
         </Route>
 
         <Route path="login" element={<Login />} />
