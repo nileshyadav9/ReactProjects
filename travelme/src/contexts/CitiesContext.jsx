@@ -38,6 +38,38 @@ function CitiesProvider({ children }) {
     }
   }
 
+  async function insertCity(newCity) {
+    try {
+      setIsLoading(true);
+      const result = await fetch(`${CITIES_URL}`, {
+        method: "POST",
+        body: JSON.stringify(newCity),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await result.json();
+      setCities((cities) => [...cities, data]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function deleteCity(cityId) {
+    try {
+      setIsLoading(true);
+      const result = await fetch(`${CITIES_URL}/${cityId}`, {
+        method: "DELETE",
+      });
+
+      setCities((cities) => cities.filter((city) => city.id != cityId));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function getFlag(flag) {
     if (flag === undefined) return;
     let countryCode = Array.from(flag, (codeUnit) => codeUnit.codePointAt())
@@ -59,6 +91,8 @@ function CitiesProvider({ children }) {
         currentCity: currentCity,
         getCity: getCity,
         getFlag: getFlag,
+        insertCity,
+        deleteCity,
       }}
     >
       {children}
