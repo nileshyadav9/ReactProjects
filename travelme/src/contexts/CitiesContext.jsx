@@ -1,72 +1,104 @@
-import { useContext } from "react";
+import { useContext, useReducer } from "react";
 import { createContext, useState, useEffect } from "react";
 
 const CITIES_URL = "http://localhost:9000/cities";
 const CitiesContext = createContext();
 
+const initialState = {
+  cities: [],
+  isLoading: false,
+  currentCity: {},
+  error: "",
+};
+function reducer(state, action) {
+  switch (action.type) {
+    case "loading":
+      return { ...state, isLoading: true };
+    case "cities/loaded":
+      return { ...state, isLoading: false, cities: action.payload };
+    case "city/loaded":
+      return { ...state, isLoading: false, cities: action.payload };
+
+    case "city/inserted":
+      return {
+        ...state,
+        isLoading: false,
+        cities: [...state.cities, action.payload],
+        currentCity: action.payload,
+      };
+
+    case "city/deleted":
+      return {
+        ...state,
+        isLoading: false,
+        cities: state.cities.filter((city) => city.id != action.payload),
+        currentCity: {},
+      };
+
+    case "errored":
+      return { ...state, isLoading: false, error: action.payload };
+    default:
+      throw new Error("Unknown Action Type!");
+  }
+}
+
 function CitiesProvider({ children }) {
-  const [cities, setCities] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentCity, setCurrentCity] = useState({});
+  const [{ cities, isLoading, currentCity }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   useEffect(function () {
     async function getCities() {
+      dispatch({ type: "loading" });
       try {
-        setIsLoading(true);
         const result = await fetch(`${CITIES_URL}`);
         const data = await result.json();
-        setCities(data);
+        dispatch({ type: "cities/loaded", payload: data });
       } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
+        dispatch({ type: "errored", payload: error });
       }
     }
     getCities();
   }, []);
 
   async function getCity(cityId) {
+    if (Number(cityId) === currentCity.id) return;
+
+    dispatch({ type: "loading" });
     try {
-      setIsLoading(true);
       const result = await fetch(`${CITIES_URL}/${cityId}`);
       const data = await result.json();
-      setCurrentCity(data);
+      dispatch({ type: "city/loaded", payload: data });
     } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: "errored", payload: error });
     }
   }
 
   async function insertCity(newCity) {
+    dispatch({ type: "loading" });
     try {
-      setIsLoading(true);
       const result = await fetch(`${CITIES_URL}`, {
         method: "POST",
         body: JSON.stringify(newCity),
         headers: { "Content-Type": "application/json" },
       });
       const data = await result.json();
-      setCities((cities) => [...cities, data]);
+      dispatch({ type: "city/inserted", payload: data });
     } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: "errored", payload: error });
     }
   }
 
   async function deleteCity(cityId) {
+    dispatch({ type: "loading" });
     try {
-      setIsLoading(true);
-      const result = await fetch(`${CITIES_URL}/${cityId}`, {
+      await fetch(`${CITIES_URL}/${cityId}`, {
         method: "DELETE",
       });
-
-      setCities((cities) => cities.filter((city) => city.id != cityId));
+      dispatch({ type: "city/deleted", payload: cityId });
     } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: "errored", payload: error });
     }
   }
 
@@ -85,10 +117,8 @@ function CitiesProvider({ children }) {
     <CitiesContext.Provider
       value={{
         cities: cities,
-        setCities: setCities,
-        isLoading: isLoading,
-        setIsLoading: setIsLoading,
-        currentCity: currentCity,
+        isLoading,
+        currentCity,
         getCity: getCity,
         getFlag: getFlag,
         insertCity,
